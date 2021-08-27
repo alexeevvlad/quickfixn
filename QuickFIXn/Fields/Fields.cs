@@ -5980,6 +5980,11 @@ namespace QuickFix.Fields
         public const int PRE_OPEN = 4;
         public const int PRE_CLOSE = 5;
         public const int REQUEST_REJECTED = 6;
+        public const int MOEX_REFRESHED = 100;
+        public const int MOEX_CONNECTED = 101;
+        public const int MOEX_FINISHED_SUCCESS = 102;
+        public const int MOEX_FINISHED_ERROR = 103;
+        public const int MOEX_RECONNECT = 104;
         public const int PREOPEN = 4;
         public const int PRECLOSE = 5;
     }

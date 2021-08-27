@@ -5172,6 +5172,11 @@
       <value enum="4" description="PRE_OPEN" />
       <value enum="5" description="PRE_CLOSE" />
       <value enum="6" description="REQUEST_REJECTED" />
+      <value enum="100" description="MOEX_REFRESHED" />
+      <value enum="101" description="MOEX_CONNECTED" />
+      <value enum="102" description="MOEX_FINISHED_SUCCESS" />
+      <value enum="103" description="MOEX_FINISHED_ERROR" />
+      <value enum="104" description="MOEX_RECONNECT" />
     </field>
     <field number="341" name="TradSesStartTime" type="UTCTIMESTAMP" />
     <field number="342" name="TradSesOpenTime" type="UTCTIMESTAMP" />
