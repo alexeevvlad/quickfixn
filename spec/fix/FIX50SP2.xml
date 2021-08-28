@@ -5641,7 +5641,7 @@
   <field number='10' name='CheckSum' type='STRING' />
   <field number='11' name='ClOrdID' type='STRING' />
   <field number='12' name='Commission' type='AMT' />
-  <field number='13' name='CommType' type='CHAR'>
+  <field number='13' name='CommType' type='INT'>
    <value enum='1' description='PER_UNIT' />
    <value enum='2' description='PERCENT' />
    <value enum='3' description='ABSOLUTE' />

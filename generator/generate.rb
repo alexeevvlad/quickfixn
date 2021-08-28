@@ -6,14 +6,14 @@ require 'fields_gen'
 require 'messages_gen'
 require 'message_factory_gen'
 
-class Generator  
+class Generator
   def self.generate
     generator = Generator.new
     generator.generate_message_factories
     generator.generate_fields
     generator.generate_messages
   end
-  
+
   def initialize
     @fix40 = FIXDictionary.load spec('FIX40')
     @fix41 = FIXDictionary.load spec('FIX41')
@@ -30,7 +30,7 @@ class Generator
   def spec fixver
     File.join File.dirname(__FILE__), "..", "spec", "fix", "#{fixver}.xml"
   end
-    
+
   def generate_fields
     fields_path = File.join(@src_path, 'Fields', 'Fields.cs')
     tags_path = File.join(@src_path, 'Fields', 'FieldTags.cs')
@@ -57,7 +57,7 @@ class Generator
       @fix41.fields[fld_name],
       @fix40.fields[fld_name]
     )
-    
+
     raise "couldn't find field! #{fld}" if fld.nil?
     fld
   end
@@ -66,7 +66,7 @@ class Generator
     defs = alldefs.reject {|d| d.nil?}
     return nil if defs.empty?
     fld = defs.first
-    
+
     vals = defs.map { |d| d[:values] }.reject { |d| d.nil? }.flatten
     return fld if vals.empty?
     vals = vals.inject([]) {|saved, v| saved << v unless saved.detect {|u| u[:desc] == v[:desc]}; saved}

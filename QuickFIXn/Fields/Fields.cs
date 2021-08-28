@@ -198,30 +198,30 @@ namespace QuickFix.Fields
     /// <summary>
     /// CommType Field
     /// </summary>/
-    public sealed class CommType : CharField
+    public sealed class CommType : IntField
     {
         public const int TAG = 13;
 
         public CommType()
             :base(Tags.CommType) {}
-        public CommType(char val)
+        public CommType(int val)
             :base(Tags.CommType, val) {}
 
 
         // Field Enumerations
-        public const char PER_UNIT = '1';
-        public const char PERCENT = '2';
-        public const char ABSOLUTE = '3';
-        public const char PERCENTAGE_WAIVED_4 = '4';
-        public const char PERCENTAGE_WAIVED_5 = '5';
-        public const char POINTS_PER_BOND_OR_CONTRACT = '6';
-        public const char PERCENTAGE = '2';
-        public const char PERCENTAGE_WAIVED_CASH_DISCOUNT = '4';
-        public const char PERCENTAGE_WAIVED_ENHANCED_UNITS = '5';
-        public const char POINTS_PER_BOND_OR_OR_CONTRACT = '6';
-        public const char QUANTITY_OF_COMMISSION_OF_URGENT_REPORT_TRANSACTION = '100';
-        public const char PER_SHARE = '1';
-        public const char PER_BOND = '6';
+        public const int PER_UNIT = 1;
+        public const int PERCENT = 2;
+        public const int ABSOLUTE = 3;
+        public const int PERCENTAGE_WAIVED_4 = 4;
+        public const int PERCENTAGE_WAIVED_5 = 5;
+        public const int POINTS_PER_BOND_OR_CONTRACT = 6;
+        public const int PERCENTAGE = 2;
+        public const int PERCENTAGE_WAIVED_CASH_DISCOUNT = 4;
+        public const int PERCENTAGE_WAIVED_ENHANCED_UNITS = 5;
+        public const int POINTS_PER_BOND_OR_OR_CONTRACT = 6;
+        public const int QUANTITY_OF_COMMISSION_OF_URGENT_REPORT_TRANSACTION = 100;
+        public const int PER_SHARE = 1;
+        public const int PER_BOND = 6;
     }
 
 
