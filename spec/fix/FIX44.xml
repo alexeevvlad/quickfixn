@@ -4504,6 +4504,8 @@
       <value enum="10" description="PER_TRANSACTION"/>
       <value enum="11" description="CONVERSION"/>
       <value enum="12" description="AGENT"/>
+      <value enum="98" description="MOEX_CLEARING_FEES"/>
+      <value enum="99" description="MOEX_TECHNICAL_ACCESS_FEES"/>
     </field>
     <field number="140" name="PrevClosePx" type="PRICE" />
     <field number="141" name="ResetSeqNumFlag" type="BOOLEAN" />

@@ -2817,6 +2817,8 @@ namespace QuickFix.Fields
         public const string CONSUMPTION_TAX = "9";
         public const string TRANSFER_FEE = "13";
         public const string SECURITY_LENDING = "14";
+        public const string MOEX_CLEARING_FEES = "98";
+        public const string MOEX_TECHNICAL_ACCESS_FEES = "99";
     }
 
 
