@@ -1006,6 +1006,7 @@ namespace QuickFix.Fields
         public const char PEGGED = 'P';
         public const char COUNTER_ORDER_SELECTION = 'Q';
         public const char MARKET_WITH_LEFTOVER_AS_LIMIT = 'K';
+        public const char MOEX_WEIGHTED_AVERAGE = 'W';
         public const char FOREX = 'C';
     }
 
