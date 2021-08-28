@@ -4007,13 +4007,14 @@
     <field number="10" name="CheckSum" type="STRING" />
     <field number="11" name="ClOrdID" type="STRING" />
     <field number="12" name="Commission" type="AMT" />
-    <field number="13" name="CommType" type="CHAR">
+    <field number="13" name="CommType" type="INT">
       <value enum="1" description="PER_UNIT" />
       <value enum="2" description="PERCENTAGE" />
       <value enum="3" description="ABSOLUTE" />
       <value enum="4" description="PERCENTAGE_WAIVED_CASH_DISCOUNT" />
       <value enum="5" description="PERCENTAGE_WAIVED_ENHANCED_UNITS" />
       <value enum="6" description="POINTS_PER_BOND_OR_OR_CONTRACT" />
+      <value enum="100" description="QUANTITY_OF_COMMISSION_OF_URGENT_REPORT_TRANSACTION" />
     </field>
     <field number="14" name="CumQty" type="QTY" />
     <field number="15" name="Currency" type="CURRENCY" />

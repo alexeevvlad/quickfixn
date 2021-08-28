@@ -219,6 +219,7 @@ namespace QuickFix.Fields
         public const char PERCENTAGE_WAIVED_CASH_DISCOUNT = '4';
         public const char PERCENTAGE_WAIVED_ENHANCED_UNITS = '5';
         public const char POINTS_PER_BOND_OR_OR_CONTRACT = '6';
+        public const char QUANTITY_OF_COMMISSION_OF_URGENT_REPORT_TRANSACTION = '100';
         public const char PER_SHARE = '1';
         public const char PER_BOND = '6';
     }
