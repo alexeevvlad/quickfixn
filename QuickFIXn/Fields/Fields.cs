@@ -6661,6 +6661,9 @@ namespace QuickFix.Fields
         public const int PEG_REFRESH = 11;
         public const int GT_RENEWAL_RESTATEMENT = 1;
         public const int MARKET_OPTION = 8;
+        public const int MOEX_CANCEL_FOK = 97;
+        public const int MOEX_CANCEL_ON_SESSION_END_OR_CROSS_TRADE = 98;
+        public const int MOEX_CANCEL_ON_DISCONNECT = 100;
     }
 
 
