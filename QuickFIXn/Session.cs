@@ -40,6 +40,7 @@ namespace QuickFix
         public bool IsSessionTime { get { return schedule_.IsSessionTime(System.DateTime.UtcNow); } }
         public bool IsLoggedOn { get { return ReceivedLogon && SentLogon; } }
         public bool SentLogon { get { return state_.SentLogon; } }
+        public bool SentLogout { get { return state_.SentLogout; } }
         public bool ReceivedLogon { get { return state_.ReceivedLogon; } }
         public bool IsNewSession
         {
