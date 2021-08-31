@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using QuickFix.Fields;
 using QuickFix.Fields.Converters;
 
@@ -912,12 +913,35 @@ namespace QuickFix
 
             if (!state_.SentLogout)
             {
-                disconnectReason = "Received logout request";
+                string text = logout.GetString(QuickFix.Fields.Tags.Text);
+                disconnectReason = "Received logout request, with text: " + text;
                 this.Log.OnEvent(disconnectReason);
-                GenerateLogout(logout);
-                this.Log.OnEvent("Sending logout response");
-            }
-            else
+
+                bool sendLogoutResponse = true;
+                #region check error as "The incoming Logon (A) message has a sequence number (1) less than expected (2) and the PossDupFlag is not set. This indicates a serious error."
+                if (text.Length > 0) {
+                    Match match = Regex.Match(text, "sequence number \\(([0-9]*)\\) less than expected \\(([0-9]*)\\)");
+                    if (match.Success && match.Groups.Count == 3) {
+                        int msg_seqnum_1 = (match.Groups[1].Value.Length > 0 ? Int16.Parse(match.Groups[1].Value) : 0);
+                        int msg_seqnum_2 = (match.Groups[2].Value.Length > 0 ? Int16.Parse(match.Groups[2].Value) : 0);
+
+                        this.Log.OnEvent("logout match error: sequence number (" + msg_seqnum_1.ToString() + ") less than expected (" + msg_seqnum_2.ToString() + ")");
+
+                        if (msg_seqnum_2 > 1 && msg_seqnum_2 > state_.GetNextSenderMsgSeqNum()) {
+                            this.Log.OnEvent("SenderMsgSeqNum set to " + msg_seqnum_2.ToString());
+                            state_.SetNextSenderMsgSeqNum(msg_seqnum_2);
+                        }
+
+                        sendLogoutResponse = false;
+                    }
+                }
+                #endregion
+
+                if(sendLogoutResponse) {
+                    GenerateLogout(logout);
+                    this.Log.OnEvent("Sending logout response");
+                }
+            } else
             {
                 disconnectReason = "Received logout response";
                 this.Log.OnEvent(disconnectReason);
