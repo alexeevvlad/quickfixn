@@ -556,6 +556,20 @@ namespace QuickFix
         }
 
         /// <summary>
+        /// Process a MessageBuilder from string
+        /// </summary>
+        /// <param name="msgStr"></param>
+        public MessageBuilder GetMessageBuilder(string msgStr) {
+            return new MessageBuilder(
+                    msgStr,
+                    SenderDefaultApplVerID,
+                    this.ValidateLengthAndChecksum,
+                    this.SessionDataDictionary,
+                    this.ApplicationDataDictionary,
+                    this.msgFactory_);
+        }
+
+        /// <summary>
         /// Process a message (in string form) from the counterparty
         /// </summary>
         /// <param name="msgStr"></param>
@@ -563,15 +577,7 @@ namespace QuickFix
         {
             this.Log.OnIncoming(msgStr);
 
-            MessageBuilder msgBuilder = new MessageBuilder(
-                    msgStr,
-                    SenderDefaultApplVerID,
-                    this.ValidateLengthAndChecksum,
-                    this.SessionDataDictionary,
-                    this.ApplicationDataDictionary,
-                    this.msgFactory_);
-
-            Next(msgBuilder);
+            Next(GetMessageBuilder(msgStr));
         }
 
         /// <summary>

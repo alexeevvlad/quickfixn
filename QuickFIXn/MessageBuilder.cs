@@ -2,7 +2,7 @@
 
 namespace QuickFix
 {
-    internal class MessageBuilder
+    public class MessageBuilder
     {
         private string _msgStr;
         private bool _validateLengthAndChecksum;
@@ -24,7 +24,7 @@ namespace QuickFix
         /// </summary>
         public string BeginString { get { return _beginString; } }
 
-        internal MessageBuilder(
+        public MessageBuilder(
             string msgStr,
             string defaultApplVerId,
             bool validateLengthAndChecksum,
@@ -42,7 +42,7 @@ namespace QuickFix
             _beginString = Message.ExtractBeginString(_msgStr);
         }
 
-        internal Message Build()
+        public Message Build()
         {
             Message message = _msgFactory.Create(_beginString, _defaultApplVerId, _msgType.Obj);
             message.FromString(
@@ -55,7 +55,7 @@ namespace QuickFix
             return _message;
         }
 
-        internal Message RejectableMessage()
+        public Message RejectableMessage()
         {
             if (_message != null)
                 return _message;
