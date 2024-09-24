@@ -1511,7 +1511,7 @@
     <field name="SecondaryClOrdID" required="N" />
     <field name="ClOrdID" required="Y" />
     <field name="ClOrdLinkID" required="N" />
-    <field name="OrigClOrdID" required="Y" />
+    <field name="OrigClOrdID" required="N" />
     <field name="OrdStatus" required="Y" />
     <field name="WorkingIndicator" required="N" />
     <field name="OrigOrdModTime" required="N" />
@@ -4412,6 +4412,7 @@
       <value enum="4" description="UNABLE_TO_PROCESS_ORDER_MASS_CANCEL_REQUEST" />
       <value enum="5" description="ORIGORDMODTIME_DID_NOT_MATCH_LAST_TRANSACTTIME_OF_ORDER" />
       <value enum="6" description="DUPLICATE_CLORDID_RECEIVED" />
+      <value enum="11" description="MOEX_INCORRECT_CLORDID" />
       <value enum="99" description="OTHER" />
     </field>
     <field number="103" name="OrdRejReason" type="INT">
@@ -5274,7 +5275,7 @@
     <field number="379" name="BusinessRejectRefID" type="STRING" />
     <field number="380" name="BusinessRejectReason" type="INT">
       <value enum="0" description="OTHER" />
-      <value enum="1" description="UNKOWN_ID" />
+      <value enum="1" description="UNKNOWN_ID" />
       <value enum="2" description="UNKNOWN_SECURITY" />
       <value enum="3" description="UNSUPPORTED_MESSAGE_TYPE" />
       <value enum="4" description="APPLICATION_NOT_AVAILABLE" />
@@ -6446,7 +6447,7 @@
       <value enum="0" description="EXPIRE_ON_TRADING_SESSION_CLOSE" />
       <value enum="1" description="EXPIRE_ON_TRADING_SESSION_OPEN" />
     </field>
-    <field number="828" name="TrdType" type="INT">
+    <field number="828" name="TrdType" type="STRING">
       <value enum="0" description="REGULAR_TRADE" />
       <value enum="1" description="BLOCK_TRADE" />
       <value enum="2" description="EFP" />
@@ -6458,6 +6459,11 @@
       <value enum="8" description="LATE_BUNCHED_TRADE" />
       <value enum="9" description="PRIOR_REFERENCE_PRICE_TRADE" />
       <value enum="10" description="AFTER_HOURS_TRADE" />
+      <value enum='22' description='MOEX_PRIVATELY_NEGOTIATED_TRADES' />
+      <value enum='53' description='MOEX_REPURCHASE_AGREEMENT' />
+      <value enum='101' description='MOEX_MARGIN_CALL' />
+      <value enum='102' description='MOEX_REPO_WITH_CCP_ASSETS_REFUND_TECHNICAL_DEAL' />
+      <value enum='F' description='MOEX_MONEY_SECURITIES_TRANSFER' />
     </field>
     <field number="829" name="TrdSubType" type="INT" />
     <field number="830" name="TransferReason" type="STRING" />

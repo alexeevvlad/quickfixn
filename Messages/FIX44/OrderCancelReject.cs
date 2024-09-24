@@ -17,14 +17,12 @@ namespace QuickFix
             public OrderCancelReject(
                     QuickFix.Fields.OrderID aOrderID,
                     QuickFix.Fields.ClOrdID aClOrdID,
-                    QuickFix.Fields.OrigClOrdID aOrigClOrdID,
                     QuickFix.Fields.OrdStatus aOrdStatus,
                     QuickFix.Fields.CxlRejResponseTo aCxlRejResponseTo
                 ) : this()
             {
                 this.OrderID = aOrderID;
                 this.ClOrdID = aClOrdID;
-                this.OrigClOrdID = aOrigClOrdID;
                 this.OrdStatus = aOrdStatus;
                 this.CxlRejResponseTo = aCxlRejResponseTo;
             }

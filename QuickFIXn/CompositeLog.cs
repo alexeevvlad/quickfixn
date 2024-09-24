@@ -45,6 +45,15 @@ namespace QuickFix
                 log.OnEvent(s);
         }
 
+        #region ILog Members FTS
+
+        public void FTSLogTraceAppend(string s) { }
+        public void FTSLogTraceAppendElapsedTicks() { }
+
+        public void FTSLogTraceAppendElapsedTicksTotal() { }
+
+        #endregion
+
         public void Dispose()
         {
             Dispose(true);

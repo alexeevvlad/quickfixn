@@ -3,12 +3,6 @@
 namespace QuickFix
 {
     /// <summary>
-    /// (Renamed per naming convention.)
-    /// </summary>
-    [System.Obsolete("Use ILog instead.")]
-    public interface Log : ILog { }
-
-    /// <summary>
     /// Session log for messages and events
     /// </summary>
     public interface ILog : IDisposable
@@ -35,5 +29,13 @@ namespace QuickFix
         /// </summary>
         /// <param name="s">event description</param>
         void OnEvent(string s);
+
+        #region FTS Members
+
+        void FTSLogTraceAppend(string s);
+        void FTSLogTraceAppendElapsedTicks();
+        void FTSLogTraceAppendElapsedTicksTotal();
+
+        #endregion
     }
 }

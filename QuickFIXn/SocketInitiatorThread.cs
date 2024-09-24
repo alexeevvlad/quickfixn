@@ -21,6 +21,7 @@ namespace QuickFix
         private byte[] readBuffer_ = new byte[BUF_SIZE];
         private Parser parser_;
         protected Stream stream_;
+        protected Socket stream_socket_;
         private Transport.SocketInitiator initiator_;
         private Session session_;
         private IPEndPoint socketEndPoint_;
@@ -61,6 +62,7 @@ namespace QuickFix
             Debug.Assert(stream_ == null);
 
             stream_ = SetupStream();
+            stream_socket_ = ((NetworkStream)stream_)?.Socket ?? default(Socket);
             session_.SetResponder(this);
         }
 
@@ -190,6 +192,15 @@ namespace QuickFix
         {
             byte[] rawData = CharEncoding.DefaultEncoding.GetBytes(data);
             stream_.Write(rawData, 0, rawData.Length);
+            return true;
+        }
+
+        public bool Send(ReadOnlySpan<byte> rawData) {
+            if (stream_socket_ != null) {
+                stream_socket_.Send(rawData, SocketFlags.None);
+            } else {
+                stream_.Write(rawData);
+            }
             return true;
         }
 

@@ -60,13 +60,12 @@ namespace QuickFix
         public const string SOH = "\u0001";
         private int field_ = 0;
         private bool validStructure_;
-        protected DataDictionary.DataDictionary dataDictionary_ = null;
 
         #region Properties
 
         public Header Header { get; private set; }
         public Trailer Trailer { get; private set; }
-        
+
         #endregion
 
         #region Constructors
@@ -428,7 +427,7 @@ namespace QuickFix
 
                     if (Tags.MsgType.Equals(f.Tag))
                     {
-                        msgType = string.Copy(f.Obj);
+                        msgType = f.Obj;
                         if (appDD != null)
                         {
                             msgMap = appDD.GetMapForMessage(msgType);
@@ -482,14 +481,6 @@ namespace QuickFix
             {
                 Validate();
             }
-        }
-
-
-        [System.Obsolete("Use the version that takes an IMessageFactory instead")]
-        protected int SetGroup(StringField grpNoFld, string msgstr, int pos, FieldMap fieldMap, DataDictionary.IGroupSpec dd,
-            DataDictionary.DataDictionary sessionDataDictionary, DataDictionary.DataDictionary appDD)
-        {
-            return SetGroup(grpNoFld, msgstr, pos, fieldMap, dd, sessionDataDictionary, appDD, null);
         }
 
 
@@ -584,9 +575,11 @@ namespace QuickFix
                 if (BodyLength() != receivedBodyLength)
                     throw new InvalidMessage("Expected BodyLength=" + BodyLength() + ", Received BodyLength=" + receivedBodyLength + ", Message.SeqNum=" + this.Header.GetInt(Tags.MsgSeqNum));
 
+                /*
                 int receivedCheckSum = this.Trailer.GetInt(Tags.CheckSum);
                 if (CheckSum() != receivedCheckSum)
                     throw new InvalidMessage("Expected CheckSum=" + CheckSum() + ", Received CheckSum=" + receivedCheckSum + ", Message.SeqNum=" + this.Header.GetInt(Tags.MsgSeqNum));
+                */
             }
             catch (FieldNotFoundException e)
             {
@@ -786,75 +779,17 @@ namespace QuickFix
             this.Trailer.Clear();
         }
 
-        private Object lock_ToString = new Object();
         public override string ToString()
         {
-            lock (lock_ToString)
-            {
-                this.Header.SetField(new BodyLength(BodyLength()), true);
-                this.Trailer.SetField(new CheckSum(Fields.Converters.CheckSumConverter.Convert(CheckSum())), true);
+            this.Header.SetField(new BodyLength(BodyLength()), true);
+            this.Trailer.SetField(new CheckSum(Fields.Converters.CheckSumConverter.Convert(CheckSum())), true);
 
-                return this.Header.CalculateString() + CalculateString() + this.Trailer.CalculateString();
-            }
+            return this.Header.CalculateString() + CalculateString() + this.Trailer.CalculateString();
         }
 
         protected int BodyLength()
         {
             return this.Header.CalculateLength() + CalculateLength() + this.Trailer.CalculateLength();
-        }
-
-        private static string FieldMapToXML(DataDictionary.DataDictionary dd, FieldMap fields, int space)
-        {
-            StringBuilder s = new StringBuilder();
-            string name = string.Empty;
-
-            // fields
-            foreach (var f in fields)
-            {
-               s.Append("<field ");
-               if ((dd != null) && ( dd.FieldsByTag.ContainsKey(f.Key)))
-               {
-                   s.Append("name=\"" + dd.FieldsByTag[f.Key].Name + "\" ");
-               }
-               s.Append("number=\"" + f.Key.ToString() + "\">");
-               s.Append("<![CDATA[" + f.Value.ToString() + "]]>");
-               s.Append("</field>");
-            }
-            // now groups
-            List<int> groupTags = fields.GetGroupTags();
-            foreach (int groupTag in groupTags)
-            {
-                for (int counter = 1; counter <= fields.GroupCount(groupTag); counter++)
-                {
-                    s.Append("<group>");
-                    s.Append(FieldMapToXML(dd, fields.GetGroup(counter, groupTag), space+1));
-                    s.Append("</group>");
-                }
-            }
-
-            return s.ToString();
-        }
-
-        /// <summary>
-        /// Get a representation of the message as an XML string.
-        /// (NOTE: this is just an ad-hoc XML; it is NOT FIXML.)
-        /// </summary>
-        /// <returns>an XML string</returns>
-        public string ToXML()
-        {
-            StringBuilder s = new StringBuilder();
-            s.AppendLine("<message>");
-            s.AppendLine("<header>");
-            s.AppendLine(FieldMapToXML(dataDictionary_, Header, 4));
-            s.AppendLine("</header>");
-            s.AppendLine("<body>");
-            s.AppendLine(FieldMapToXML(dataDictionary_, this, 4));
-            s.AppendLine("</body>");
-            s.AppendLine("<trailer>");
-            s.AppendLine(FieldMapToXML(dataDictionary_, Trailer, 4));
-            s.AppendLine("</trailer>");
-            s.AppendLine("</message>");
-            return s.ToString();
         }
     }
 }

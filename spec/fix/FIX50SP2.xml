@@ -8729,7 +8729,7 @@
    <value enum='1' description='EXPIRE_ON_TRADING_SESSION_OPEN' />
    <value enum='2' description='TRADING_ELIGIBILITY_EXPIRATION_SPECIFIED_IN_THE_DATE_AND_TIME_FIELDS_EVENTDATE' />
   </field>
-  <field number='828' name='TrdType' type='INT'>
+  <field number='828' name='TrdType' type='STRING'>
    <value enum='0' description='REGULAR_TRADE' />
    <value enum='1' description='BLOCK_TRADE_1' />
    <value enum='10' description='AFTER_HOURS_TRADE' />

@@ -48,7 +48,7 @@
         /// </summary>
         public override string toStringField()
         {
-            if (_changed.Equals(true))
+            if (_changed)
                 makeStringFields();
             return _stringField;
         }
@@ -123,6 +123,7 @@
 
         #region Private members
         private string _stringField;
+        //private string _stringField { get => Tag + "=" + _stringVal; }
         private bool _changed;
         private T _obj;
         private int _tag;

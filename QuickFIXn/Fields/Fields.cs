@@ -2152,6 +2152,7 @@ namespace QuickFix.Fields
         public const int BROKER_EXCHANGE_OPTION = 2;
         public const int ORIGORDMODTIME_DID_NOT_MATCH_LAST_TRANSACTTIME_OF_ORDER = 5;
         public const int DUPLICATE_CLORDID_RECEIVED = 6;
+        public const int MOEX_INCORRECT_CLORDID = 11;
         public const int ALREADY_PENDING = 3;
         public const int BROKER_OPTION = 2;
     }
@@ -15874,73 +15875,78 @@ namespace QuickFix.Fields
     /// <summary>
     /// TrdType Field
     /// </summary>/
-    public sealed class TrdType : IntField
+    public sealed class TrdType : StringField
     {
         public const int TAG = 828;
 
         public TrdType()
             :base(Tags.TrdType) {}
-        public TrdType(int val)
+        public TrdType(string val)
             :base(Tags.TrdType, val) {}
 
 
         // Field Enumerations
-        public const int REGULAR_TRADE = 0;
-        public const int BLOCK_TRADE_1 = 1;
-        public const int AFTER_HOURS_TRADE = 10;
-        public const int EFP = 2;
-        public const int TRANSFER = 3;
-        public const int LATE_TRADE = 4;
-        public const int T_TRADE = 5;
-        public const int WEIGHTED_AVERAGE_PRICE_TRADE = 6;
-        public const int BUNCHED_TRADE = 7;
-        public const int LATE_BUNCHED_TRADE = 8;
-        public const int PRIOR_REFERENCE_PRICE_TRADE = 9;
-        public const int EXCHANGE_FOR_RISK = 11;
-        public const int EXCHANGE_FOR_SWAP = 12;
-        public const int EXCHANGE_OF_FUTURES_FOR = 13;
-        public const int EXCHANGE_OF_OPTIONS_FOR_OPTIONS = 14;
-        public const int TRADING_AT_SETTLEMENT = 15;
-        public const int ALL_OR_NONE = 16;
-        public const int FUTURES_LARGE_ORDER_EXECUTION = 17;
-        public const int EXCHANGE_OF_FUTURES_FOR_FUTURES = 18;
-        public const int OPTION_INTERIM_TRADE = 19;
-        public const int OPTION_CABINET_TRADE = 20;
-        public const int PRIVATELY_NEGOTIATED_TRADES = 22;
-        public const int SUBSTITUTION_OF_FUTURES_FOR_FORWARDS = 23;
-        public const int ERROR_TRADE = 24;
-        public const int SPECIAL_CUM_DIVIDEND = 25;
-        public const int SPECIAL_EX_DIVIDEND = 26;
-        public const int SPECIAL_CUM_COUPON = 27;
-        public const int SPECIAL_EX_COUPON = 28;
-        public const int CASH_SETTLEMENT = 29;
-        public const int SPECIAL_PRICE = 30;
-        public const int GUARANTEED_DELIVERY = 31;
-        public const int SPECIAL_CUM_RIGHTS = 32;
-        public const int SPECIAL_EX_RIGHTS = 33;
-        public const int SPECIAL_CUM_CAPITAL_REPAYMENTS = 34;
-        public const int SPECIAL_EX_CAPITAL_REPAYMENTS = 35;
-        public const int SPECIAL_CUM_BONUS = 36;
-        public const int SPECIAL_EX_BONUS = 37;
-        public const int BLOCK_TRADE_38 = 38;
-        public const int WORKED_PRINCIPAL_TRADE = 39;
-        public const int BLOCK_TRADES = 40;
-        public const int NAME_CHANGE = 41;
-        public const int PORTFOLIO_TRANSFER = 42;
-        public const int PROROGATION_BUY = 43;
-        public const int PROROGATION_SELL = 44;
-        public const int OPTION_EXERCISE = 45;
-        public const int DELTA_NEUTRAL_TRANSACTION = 46;
-        public const int FINANCING_TRANSACTION = 47;
-        public const int NON_STANDARD_SETTLEMENT = 48;
-        public const int DERIVATIVE_RELATED_TRANSACTION = 49;
-        public const int PORTFOLIO_TRADE = 50;
-        public const int VOLUME_WEIGHTED_AVERAGE_TRADE = 51;
-        public const int EXCHANGE_GRANTED_TRADE = 52;
-        public const int REPURCHASE_AGREEMENT = 53;
-        public const int OTC = 54;
-        public const int EXCHANGE_BASIS_FACILITY = 55;
-        public const int BLOCK_TRADE = 1;
+        public const string REGULAR_TRADE = "0";
+        public const string BLOCK_TRADE_1 = "1";
+        public const string AFTER_HOURS_TRADE = "10";
+        public const string EFP = "2";
+        public const string TRANSFER = "3";
+        public const string LATE_TRADE = "4";
+        public const string T_TRADE = "5";
+        public const string WEIGHTED_AVERAGE_PRICE_TRADE = "6";
+        public const string BUNCHED_TRADE = "7";
+        public const string LATE_BUNCHED_TRADE = "8";
+        public const string PRIOR_REFERENCE_PRICE_TRADE = "9";
+        public const string EXCHANGE_FOR_RISK = "11";
+        public const string EXCHANGE_FOR_SWAP = "12";
+        public const string EXCHANGE_OF_FUTURES_FOR = "13";
+        public const string EXCHANGE_OF_OPTIONS_FOR_OPTIONS = "14";
+        public const string TRADING_AT_SETTLEMENT = "15";
+        public const string ALL_OR_NONE = "16";
+        public const string FUTURES_LARGE_ORDER_EXECUTION = "17";
+        public const string EXCHANGE_OF_FUTURES_FOR_FUTURES = "18";
+        public const string OPTION_INTERIM_TRADE = "19";
+        public const string OPTION_CABINET_TRADE = "20";
+        public const string PRIVATELY_NEGOTIATED_TRADES = "22";
+        public const string SUBSTITUTION_OF_FUTURES_FOR_FORWARDS = "23";
+        public const string ERROR_TRADE = "24";
+        public const string SPECIAL_CUM_DIVIDEND = "25";
+        public const string SPECIAL_EX_DIVIDEND = "26";
+        public const string SPECIAL_CUM_COUPON = "27";
+        public const string SPECIAL_EX_COUPON = "28";
+        public const string CASH_SETTLEMENT = "29";
+        public const string SPECIAL_PRICE = "30";
+        public const string GUARANTEED_DELIVERY = "31";
+        public const string SPECIAL_CUM_RIGHTS = "32";
+        public const string SPECIAL_EX_RIGHTS = "33";
+        public const string SPECIAL_CUM_CAPITAL_REPAYMENTS = "34";
+        public const string SPECIAL_EX_CAPITAL_REPAYMENTS = "35";
+        public const string SPECIAL_CUM_BONUS = "36";
+        public const string SPECIAL_EX_BONUS = "37";
+        public const string BLOCK_TRADE_38 = "38";
+        public const string WORKED_PRINCIPAL_TRADE = "39";
+        public const string BLOCK_TRADES = "40";
+        public const string NAME_CHANGE = "41";
+        public const string PORTFOLIO_TRANSFER = "42";
+        public const string PROROGATION_BUY = "43";
+        public const string PROROGATION_SELL = "44";
+        public const string OPTION_EXERCISE = "45";
+        public const string DELTA_NEUTRAL_TRANSACTION = "46";
+        public const string FINANCING_TRANSACTION = "47";
+        public const string NON_STANDARD_SETTLEMENT = "48";
+        public const string DERIVATIVE_RELATED_TRANSACTION = "49";
+        public const string PORTFOLIO_TRADE = "50";
+        public const string VOLUME_WEIGHTED_AVERAGE_TRADE = "51";
+        public const string EXCHANGE_GRANTED_TRADE = "52";
+        public const string REPURCHASE_AGREEMENT = "53";
+        public const string OTC = "54";
+        public const string EXCHANGE_BASIS_FACILITY = "55";
+        public const string BLOCK_TRADE = "1";
+        public const string MOEX_PRIVATELY_NEGOTIATED_TRADES = "22";
+        public const string MOEX_REPURCHASE_AGREEMENT = "53";
+        public const string MOEX_MARGIN_CALL = "101";
+        public const string MOEX_REPO_WITH_CCP_ASSETS_REFUND_TECHNICAL_DEAL = "102";
+        public const string MOEX_MONEY_SECURITIES_TRANSFER = "F";
     }
 
 

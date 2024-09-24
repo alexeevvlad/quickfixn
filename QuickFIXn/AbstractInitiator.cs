@@ -52,6 +52,13 @@ namespace QuickFix
             HashSet<SessionID> definedSessions = _settings.GetSessions();
             if (0 == definedSessions.Count)
                 throw new ConfigError("No sessions defined");
+
+            // create all sessions
+            sessionFactory_ = new SessionFactory(_app, _storeFactory, _logFactory, _msgFactory);
+            foreach (SessionID sessionID in definedSessions) {
+                Dictionary dict = _settings.Get(sessionID);
+                CreateSession(sessionID, dict);
+            }
         }
 
         public void Start()
@@ -60,12 +67,13 @@ namespace QuickFix
                 throw new System.ObjectDisposedException(this.GetType().Name);
 
             // create all sessions
+            /*
             sessionFactory_ = new SessionFactory(_app, _storeFactory, _logFactory, _msgFactory);
-            foreach (SessionID sessionID in _settings.GetSessions())
-            {
+            foreach (SessionID sessionID in definedSessions) {
                 Dictionary dict = _settings.Get(sessionID);
                 CreateSession(sessionID, dict);
             }
+            */
 
             if (0 == sessions_.Count)
                 throw new ConfigError("No sessions defined for initiator");
@@ -105,7 +113,7 @@ namespace QuickFix
         /// <param name="sessionID">ID of new session</param>
         /// <param name="dict">config settings for new session</param>
         /// <returns>true if session added successfully, false if session already exists or is not an initiator</returns>
-        private bool CreateSession(SessionID sessionID, Dictionary dict)
+        protected bool CreateSession(SessionID sessionID, Dictionary dict)
         {
             if (dict.GetString(SessionSettings.CONNECTION_TYPE) == "initiator" && !sessionIDs_.Contains(sessionID))
             {
@@ -258,10 +266,6 @@ namespace QuickFix
         /// </summary>
         /// <param name="sessionID">ID of session that was removed</param>
         protected virtual void OnRemove(SessionID sessionID)
-        { }
-
-        [System.Obsolete("This method's intended purpose is unclear.  Don't use it.")]
-        protected virtual void OnInitialize(SessionSettings settings)
         { }
 
         #endregion

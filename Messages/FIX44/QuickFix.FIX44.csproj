@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+	<TargetFrameworks>net8.0</TargetFrameworks>
+	<LangVersion>Preview</LangVersion>
     <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
     <Title>QuickFIX/n FIX4.4 Messages</Title>
     <PackageId>QuickFIXn.FIX4.4</PackageId>
@@ -19,6 +20,10 @@
     <PackageTags>QuickFIX QuickFIX/n FIX</PackageTags>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>C:\SCRIPT_DONOT_DELETE_THIS\FTSEngine\FTSEngine.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,9 +36,5 @@
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)$(SolutionName).Connect.Fix\Dependencies\$(TargetFileName)&quot;" />
-  </Target>
 
 </Project>

@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+	<TargetFrameworks>net8.0</TargetFrameworks>
+	<LangVersion>Preview</LangVersion>
     <Title>QuickFIX/n</Title>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
@@ -22,6 +23,10 @@
     <PackageProjectUrl>http://quickfixn.org/</PackageProjectUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>C:\SCRIPT_DONOT_DELETE_THIS\FTSEngine\FTSEngine.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,14 +35,4 @@
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
-
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>UnitTests</_Parameter1>
-    </AssemblyAttribute>
-  </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)$(SolutionName).Connect.Fix\Dependencies\$(TargetFileName)&quot;" />
-  </Target>
 </Project>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Text.RegularExpressions;
 using QuickFix.Fields;
 using QuickFix.Fields.Converters;
@@ -232,7 +233,7 @@ namespace QuickFix
         /// <summary>
         /// Returns whether the Session has a Responder. This method is synchronized
         /// </summary>
-        public bool HasResponder { get { lock (sync_) { return null != responder_; } } }
+        public bool HasResponder { get { Thread.MemoryBarrier(); return null != responder_; } }
 
         /// <summary>
         /// Returns whether the Sessions will allow ResetSequence messages sent as
@@ -241,17 +242,6 @@ namespace QuickFix
         public bool RequiresOrigSendingTime { get; set; }
 
         #endregion
-
-        /// <summary>
-        /// Don't use this.  It decides the connection is an initiator if heartBtInt=0,
-        /// which is bad because 0 is actually a valid (though not-often-used) setting.
-        /// </summary>
-        [System.Obsolete("Use the constructor that takes the isInitiator parameter.")]
-        public Session(
-            IApplication app, IMessageStoreFactory storeFactory, SessionID sessID, DataDictionaryProvider dataDictProvider,
-            SessionSchedule sessionSchedule, int heartBtInt, ILogFactory logFactory, IMessageFactory msgFactory, string senderDefaultApplVerID)
-            : this(0 == heartBtInt, app, storeFactory, sessID, dataDictProvider, sessionSchedule, heartBtInt, logFactory, msgFactory, senderDefaultApplVerID)
-        { }
 
         public Session(
             bool isInitiator, IApplication app, IMessageStoreFactory storeFactory, SessionID sessID, DataDictionaryProvider dataDictProvider,
@@ -342,32 +332,6 @@ namespace QuickFix
             return LookupSession(sessionID) == null ? false : true;
         }
 
-        /// <summary>
-        /// Sends a message to the session specified by the provider session ID.
-        /// </summary>
-        /// <param name="message">FIX message</param>
-        /// <param name="sessionID">target SessionID</param>
-        /// <returns>true if send was successful, false otherwise</returns>
-        public static bool SendToTarget(Message message, SessionID sessionID)
-        {
-            message.SetSessionID(sessionID);
-            Session session = Session.LookupSession(sessionID);
-            if (null == session)
-                throw new SessionNotFound(sessionID);
-            return session.Send(message);
-        }
-
-        /// <summary>
-        /// Send to session indicated by header fields in message
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public static bool SendToTarget(Message message)
-        {
-            SessionID sessionID = message.GetSessionID(message);
-            return SendToTarget(message, sessionID);
-        }
-
         #endregion
 
         /// <summary>
@@ -389,13 +353,28 @@ namespace QuickFix
         /// <returns></returns>
         public bool Send(string message)
         {
+            bool result = false;
             lock (sync_)
             {
-                if (null == responder_)
-                    return false;
-                this.Log.OnOutgoing(message);
-                return responder_.Send(message);
+                if (null != responder_) {
+                    result = responder_.Send(message);
+                }
             }
+            this.Log.OnOutgoing("Send[M]" + message);
+            return result;
+        }
+
+        /// <summary>
+        /// Sends a message
+        /// </summary>
+        /// <param name="rawData"></param>
+        /// <returns></returns>
+        public bool Send(ReadOnlySpan<byte> rawData) {
+            bool result = responder_?.Send(rawData) ?? false;
+
+            this.Log.FTSLogTraceAppendElapsedTicks();
+            this.Log.FTSLogTraceAppendElapsedTicksTotal();
+            return result;
         }
 
         // TODO for v2 - rename, make internal
@@ -1083,12 +1062,6 @@ namespace QuickFix
             state_.Refresh();
         }
 
-        [Obsolete("Use Reset(reason) instead.")]
-        public void Reset()
-        {
-            this.Reset("(unspecified reason)");
-        }
-
         /// <summary>
         /// Send a logout, disconnect, and reset session state
         /// </summary>
@@ -1593,6 +1566,14 @@ namespace QuickFix
             state_.IncrNextSenderMsgSeqNum();
         }
 
+        protected void Persist(IMessage message, string messageString) {
+            if (this.PersistMessages) {
+                int msgSeqNum = message.MsgSeqNum;
+                state_.Set(msgSeqNum, messageString);
+            }
+            state_.IncrNextSenderMsgSeqNum();
+        }
+
         protected bool IsGoodTime(Message msg)
         {
             if (!CheckLatency)
@@ -1682,6 +1663,7 @@ namespace QuickFix
 
         protected bool SendRaw(Message message, int seqNum)
         {
+            this.Log.OnOutgoing("Send[I]");
             lock (sync_)
             {
                 string msgType = message.Header.GetString(Fields.Tags.MsgType);
@@ -1717,11 +1699,78 @@ namespace QuickFix
                     }
                 }
 
+                this.Log.OnOutgoing("Send[T][0]");
+
                 string messageString = message.ToString();
+
+                this.Log.OnOutgoing("Send[T][1]");
+
                 if (0 == seqNum)
                     Persist(message, messageString);
                 return Send(messageString);
             }
+        }
+
+        /// <summary>
+        /// Sends a message via the session indicated by the header fields
+        /// </summary>
+        /// <param name="message">message to send</param>
+        /// <returns>true if was sent successfully</returns>
+        public bool Send<T>(T message) where T : IMessage {
+            this.Log.FTSLogTraceAppend(" fixSessionSend");
+            this.Log.FTSLogTraceAppendElapsedTicks();
+
+            bool resultSend;
+
+            string outgoingMsg;
+
+            lock (sync_) {
+                this.Log.FTSLogTraceAppend(" sync");
+                this.Log.FTSLogTraceAppendElapsedTicks();
+
+                message.MsgSeqNum = state_.GetNextSenderMsgSeqNum();
+
+                this.Log.FTSLogTraceAppend(" fixSetHeaders");
+                this.Log.FTSLogTraceAppendElapsedTicks();
+
+                /*
+                //todo
+                if (this.EnableLastMsgSeqNumProcessed && !m.Header.IsSetField(Tags.LastMsgSeqNumProcessed)) {
+                    m.Header.SetField(new LastMsgSeqNumProcessed(this.NextTargetMsgSeqNum - 1));
+                }
+                */
+
+                /*
+                if (Message.IsAdminMsgType(message.MsgType)) {
+                    this.Application.ToAdmin(message, this.SessionID);
+
+                    if (MsgType.LOGON.Equals(message.MsgType) && !state_.ReceivedReset) {
+                        Fields.ResetSeqNumFlag resetSeqNumFlag = new QuickFix.Fields.ResetSeqNumFlag(false);
+                        if (message.IsSetField(resetSeqNumFlag))
+                            message.GetField(resetSeqNumFlag);
+                        if (resetSeqNumFlag.getValue()) {
+                            state_.Reset("ResetSeqNumFlag");
+                            message.Header.SetField(new Fields.MsgSeqNum(state_.GetNextSenderMsgSeqNum()));
+                        }
+                        state_.SentReset = resetSeqNumFlag.Obj;
+                    }
+                }
+                */
+
+                ReadOnlySpan<byte> messageBytes = message.GetSpan();
+
+                resultSend = Send(messageBytes);
+
+                state_.LastSentTimeDT = DateTime.UtcNow;
+
+                outgoingMsg = CharEncoding.DefaultEncoding.GetString(messageBytes);
+
+                Persist(message, outgoingMsg);
+            }
+
+            this.Log.OnOutgoing("Send " + outgoingMsg);
+
+            return resultSend;
         }
 
         public void Dispose()

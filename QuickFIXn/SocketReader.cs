@@ -20,17 +20,6 @@ namespace QuickFix
         private ClientHandlerThread responder_;
         private readonly AcceptorSocketDescriptor acceptorDescriptor_;
 
-        /// <summary>
-        /// Keep a handle to the current outstanding read request (if any)
-        /// </summary>
-        private IAsyncResult currentReadRequest_;
-
-        [Obsolete("Use other constructor")]
-        public SocketReader(TcpClient tcpClient, ClientHandlerThread responder)
-            : this(tcpClient, new SocketSettings(), responder)
-        {
-        }
-
         public SocketReader(TcpClient tcpClient, SocketSettings settings, ClientHandlerThread responder)
             : this(tcpClient, settings, responder, null)
         {
@@ -71,10 +60,16 @@ namespace QuickFix
             catch (System.Exception e)
             {
                 HandleExceptionInternal(qfSession_, e);
-                throw e;
+                throw;
             }
         }
 
+        /// <summary>
+        /// Keep a handle to the current outstanding read request (if any)
+        /// </summary>
+        private IAsyncResult currentReadRequest_;
+        /// <summary>
+        /// 
         /// <summary>
         /// Reads data from the network into the specified buffer.
         /// It will wait up to the specified number of milliseconds for data to arrive,
@@ -128,12 +123,6 @@ namespace QuickFix
                 else
                     throw; //rethrow original exception
             }
-        }
-
-        [Obsolete("This should be made private")]
-        public void OnMessageFound(string msg)
-        {
-            OnMessageFoundInternal(msg);
         }
 
         protected void OnMessageFoundInternal(string msg)
@@ -220,13 +209,6 @@ namespace QuickFix
                 OnMessageFoundInternal(msg);
         }
 
-        [Obsolete("Static function can't close stream properly")]
-        protected static void DisconnectClient(TcpClient client)
-        {
-            client.Client.Close();
-            client.Close();
-        }
-
         protected void DisconnectClient()
         {
             stream_.Close();
@@ -248,12 +230,6 @@ namespace QuickFix
             qfSession_.Log.OnEvent(qfSession_.SessionID + " Acceptor heartbeat set to " + qfSession_.HeartBtInt + " seconds");
             qfSession_.SetResponder(responder_);
             return true;
-        }
-
-        [Obsolete("This should be made private/protected")]
-        public void HandleException(Session quickFixSession, System.Exception cause, TcpClient client)
-        {
-            HandleExceptionInternal(quickFixSession, cause);
         }
 
         private bool IsAssumedSession(SessionID sessionID)
@@ -332,6 +308,11 @@ namespace QuickFix
         {
             byte[] rawData = CharEncoding.DefaultEncoding.GetBytes(data);
             stream_.Write(rawData, 0, rawData.Length);
+            return rawData.Length;
+        }
+
+        public int Send(ReadOnlySpan<byte> rawData) {
+            stream_.Write(rawData);
             return rawData.Length;
         }
 
