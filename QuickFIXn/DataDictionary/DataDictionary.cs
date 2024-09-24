@@ -90,8 +90,7 @@ namespace QuickFix.DataDictionary
 
             if (((null != sessionDataDict) && sessionDataDict.CheckFieldsOutOfOrder) || ((null != appDataDict) && appDataDict.CheckFieldsOutOfOrder))
             {
-                int field;
-                if (!message.HasValidStructure(out field))
+                if (!message.HasValidStructure(out var field))
                     throw new TagOutOfOrder(field);
             }
 
@@ -305,11 +304,11 @@ namespace QuickFix.DataDictionary
                     Fields.Converters.BoolConverter.Convert(field.ToString());
 
                 else if (type == typeof(DateTimeField))
-                    Fields.Converters.DateTimeConverter.ConvertToDateTime(field.ToString());
+                    Fields.Converters.DateTimeConverter.ParseToDateTime(field.ToString());
                 else if (type == typeof(DateOnlyField))
-                    Fields.Converters.DateTimeConverter.ConvertToDateOnly(field.ToString());
+                    Fields.Converters.DateTimeConverter.ParseToDateOnly(field.ToString());
                 else if (type == typeof(TimeOnlyField))
-                    Fields.Converters.DateTimeConverter.ConvertToTimeOnly(field.ToString());
+                    Fields.Converters.DateTimeConverter.ParseToTimeOnly(field.ToString());
                 return;
 
             }
@@ -505,9 +504,11 @@ namespace QuickFix.DataDictionary
             }
         }
 
-        private void CacheComponents(XmlDocument doc) {
+        private void CacheComponents(XmlDocument doc)
+        {
             XmlNodeList nodeList = doc.SelectNodes("//components/component");
-            foreach (XmlNode compEl in nodeList) {
+            foreach (XmlNode compEl in nodeList)
+            {
                 ComponentsByName[compEl.Attributes["name"].Value] = compEl;
             }
         }
@@ -594,7 +595,7 @@ namespace QuickFix.DataDictionary
         /// </param>
         private void ParseMsgEl(XmlNode node, DDMap ddmap, bool? componentRequired)
         {
-            /* 
+            /*
             // This code is great for debugging DD parsing issues.
             string s = "+ " + node.Name;  // node.Name is probably "message"
             if (node.Attributes["name"] != null)
