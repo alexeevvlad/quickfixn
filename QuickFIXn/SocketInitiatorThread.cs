@@ -25,6 +25,7 @@ namespace QuickFix
         private readonly byte[] _readBuffer = new byte[BUF_SIZE];
         private readonly Parser _parser = new();
         private Stream? _stream;
+        private Socket? _stream_socket;
         private readonly CancellationTokenSource _readCancellationTokenSource = new();
         private readonly IPEndPoint _socketEndPoint;
         private readonly SocketSettings _socketSettings;
@@ -72,6 +73,7 @@ namespace QuickFix
             Debug.Assert(_stream == null);
 
             _stream = SetupStream();
+            _stream_socket = ((NetworkStream)_stream)?.Socket ?? default(Socket);
             Session.SetResponder(this);
         }
 
@@ -190,10 +192,10 @@ namespace QuickFix
         }
 
         public bool Send(ReadOnlySpan<byte> rawData) {
-            if (stream_socket_ != null) {
-                stream_socket_.Send(rawData, SocketFlags.None);
-            } else {
-                stream_.Write(rawData);
+            if (_stream_socket != null) {
+                _stream_socket.Send(rawData, SocketFlags.None);
+            } else if(_stream != null) {
+                _stream.Write(rawData);
             }
             return true;
         }

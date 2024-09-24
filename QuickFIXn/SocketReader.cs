@@ -65,20 +65,16 @@ namespace QuickFix
         }
 
         /// <summary>
-        /// Keep a handle to the current outstanding read request (if any)
-        /// </summary>
-        private IAsyncResult currentReadRequest_;
-        /// <summary>
-        ///
-        /// <summary>
         /// Reads data from the network into the specified buffer.
         /// It will wait up to the specified number of milliseconds for data to arrive,
         /// if no data has arrived after the specified number of milliseconds then the function returns 0
         /// </summary>
+        /// <summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="timeoutMilliseconds">The timeout milliseconds.</param>
         /// <returns>The number of bytes read into the buffer</returns>
         /// <exception cref="System.Net.Sockets.SocketException">On connection reset</exception>
+        /// </summary>
         protected virtual int ReadSome(byte[] buffer, int timeoutMilliseconds)
         {
             // NOTE: THIS FUNCTION IS (nearly) EXACTLY THE SAME AS THE ONE IN SocketInitiatorThread.
@@ -284,7 +280,7 @@ namespace QuickFix
         }
 
         public int Send(ReadOnlySpan<byte> rawData) {
-            stream_.Write(rawData);
+            _stream.Write(rawData);
             return rawData.Length;
         }
 

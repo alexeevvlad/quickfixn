@@ -29,4 +29,12 @@ public interface ILog : IDisposable
     /// </summary>
     /// <param name="s">event description</param>
     void OnEvent(string s);
+
+    #region FTS Members
+
+    void FTSLogTraceAppend(string s);
+    void FTSLogTraceAppendElapsedTicks();
+    void FTSLogTraceAppendElapsedTicksTotal();
+
+    #endregion
 }

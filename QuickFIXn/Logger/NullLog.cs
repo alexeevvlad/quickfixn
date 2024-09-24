@@ -24,4 +24,13 @@ public sealed class NullLog : ILog
     { }
 
     #endregion
+
+    #region ILog Members FTS
+
+    public void FTSLogTraceAppend(string s) { }
+    public void FTSLogTraceAppendElapsedTicks() { }
+
+    public void FTSLogTraceAppendElapsedTicksTotal() { }
+
+    #endregion
 }

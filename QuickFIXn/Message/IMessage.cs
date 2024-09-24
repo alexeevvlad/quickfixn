@@ -9,7 +9,7 @@ namespace QuickFix {
         public string MsgType { get; }
         public short  MsgMaxBufferLength { get; }
 
-        public int    MsgSeqNum { get; set; }
+        public SeqNumType MsgSeqNum { get; set; }
 
         public ReadOnlySpan<byte> GetSpan();
     }

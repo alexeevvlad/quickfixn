@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Collections.Generic;
 using System;
+
 using QuickFix.Logger;
 using QuickFix.Store;
 
@@ -42,11 +43,9 @@ namespace QuickFix
             if (0 == definedSessions.Count)
                 throw new ConfigError("No sessions defined");
 
-            // create all sessions
-            sessionFactory_ = new SessionFactory(_app, _storeFactory, _logFactory, _msgFactory);
-            foreach (SessionID sessionID in definedSessions) {
-                Dictionary dict = _settings.Get(sessionID);
-                CreateSession(sessionID, dict);
+            foreach (SessionID sessionId in _settings.GetSessions()) {
+                SettingsDictionary dict = _settings.Get(sessionId);
+                CreateSession(sessionId, dict);
             }
         }
 
@@ -57,10 +56,10 @@ namespace QuickFix
 
             // create all sessions
             /*
-            sessionFactory_ = new SessionFactory(_app, _storeFactory, _logFactory, _msgFactory);
-            foreach (SessionID sessionID in definedSessions) {
-                Dictionary dict = _settings.Get(sessionID);
-                CreateSession(sessionID, dict);
+            foreach (SessionID sessionId in _settings.GetSessions())
+            {
+                SettingsDictionary dict = _settings.Get(sessionId);
+                CreateSession(sessionId, dict);
             }
             */
 
@@ -102,7 +101,7 @@ namespace QuickFix
         /// <param name="sessionId">ID of new session</param>
         /// <param name="dict">config settings for new session</param>
         /// <returns>true if session added successfully, false if session already exists or is not an initiator</returns>
-        protected bool CreateSession(SessionID sessionID, Dictionary dict)
+        protected bool CreateSession(SessionID sessionId, SettingsDictionary dict)
         {
             if (dict.GetString(SessionSettings.CONNECTION_TYPE) == "initiator" && !_sessionIDs.Contains(sessionId))
             {

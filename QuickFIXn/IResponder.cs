@@ -1,4 +1,6 @@
-﻿namespace QuickFix
+﻿using System;
+
+namespace QuickFix
 {
     /// <summary>
     /// Used by a Session to send raw FIX message data and to disconnect a

@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading;
 using QuickFix.Fields;
 using QuickFix.Fields.Converters;
@@ -352,14 +353,15 @@ namespace QuickFix
         /// <returns></returns>
         public bool Send(string message)
         {
+            bool result;
             lock (_sync)
             {
                 if (_responder is null)
                     return false;
                 Log.OnOutgoing(message);
-                return _responder.Send(message);
+                result = _responder.Send(message);
             }
-            this.Log.OnOutgoing("Send[M]" + message);
+            Log.OnOutgoing("Send[M]" + message);
             return result;
         }
 
@@ -369,10 +371,10 @@ namespace QuickFix
         /// <param name="rawData"></param>
         /// <returns></returns>
         public bool Send(ReadOnlySpan<byte> rawData) {
-            bool result = responder_?.Send(rawData) ?? false;
+            bool result = _responder?.Send(rawData) ?? false;
 
-            this.Log.FTSLogTraceAppendElapsedTicks();
-            this.Log.FTSLogTraceAppendElapsedTicksTotal();
+            Log.FTSLogTraceAppendElapsedTicks();
+            Log.FTSLogTraceAppendElapsedTicksTotal();
             return result;
         }
 
@@ -520,20 +522,6 @@ namespace QuickFix
         {
             NextMessage(msgStr);
             NextQueued();
-        }
-
-        /// <summary>
-        /// Process a MessageBuilder from string
-        /// </summary>
-        /// <param name="msgStr"></param>
-        public MessageBuilder GetMessageBuilder(string msgStr) {
-            return new MessageBuilder(
-                    msgStr,
-                    SenderDefaultApplVerID,
-                    this.ValidateLengthAndChecksum,
-                    this.SessionDataDictionary,
-                    this.ApplicationDataDictionary,
-                    this.msgFactory_);
         }
 
         /// <summary>
@@ -877,21 +865,21 @@ namespace QuickFix
             {
                 string text = logout.GetString(QuickFix.Fields.Tags.Text);
                 disconnectReason = "Received logout request, with text: " + text;
-                this.Log.OnEvent(disconnectReason);
+                Log.OnEvent(disconnectReason);
 
                 bool sendLogoutResponse = true;
                 #region check error as "The incoming Logon (A) message has a sequence number (1) less than expected (2) and the PossDupFlag is not set. This indicates a serious error."
                 if (text.Length > 0) {
                     Match match = Regex.Match(text, "sequence number \\(([0-9]*)\\) less than expected \\(([0-9]*)\\)");
                     if (match.Success && match.Groups.Count == 3) {
-                        int msg_seqnum_1 = (match.Groups[1].Value.Length > 0 ? Int16.Parse(match.Groups[1].Value) : 0);
-                        int msg_seqnum_2 = (match.Groups[2].Value.Length > 0 ? Int16.Parse(match.Groups[2].Value) : 0);
+                        SeqNumType msg_seqnum_1 = (match.Groups[1].Value.Length > 0 ? SeqNumType.Parse(match.Groups[1].Value) : 0);
+                        SeqNumType msg_seqnum_2 = (match.Groups[2].Value.Length > 0 ? SeqNumType.Parse(match.Groups[2].Value) : 0);
 
-                        this.Log.OnEvent("logout match error: sequence number (" + msg_seqnum_1.ToString() + ") less than expected (" + msg_seqnum_2.ToString() + ")");
+                        Log.OnEvent("logout match error: sequence number (" + msg_seqnum_1.ToString() + ") less than expected (" + msg_seqnum_2.ToString() + ")");
 
-                        if (msg_seqnum_2 > 1 && msg_seqnum_2 > state_.GetNextSenderMsgSeqNum()) {
-                            this.Log.OnEvent("SenderMsgSeqNum set to " + msg_seqnum_2.ToString());
-                            state_.SetNextSenderMsgSeqNum(msg_seqnum_2);
+                        if (msg_seqnum_2 > 1 && msg_seqnum_2 > _state.NextSenderMsgSeqNum) {
+                            Log.OnEvent("SenderMsgSeqNum set to " + msg_seqnum_2.ToString());
+                            _state.NextSenderMsgSeqNum = msg_seqnum_2;
                         }
 
                         sendLogoutResponse = false;
@@ -901,7 +889,7 @@ namespace QuickFix
 
                 if(sendLogoutResponse) {
                     GenerateLogout(logout);
-                    this.Log.OnEvent("Sending logout response");
+                    Log.OnEvent("Sending logout response");
                 }
             } else
             {
@@ -1504,11 +1492,11 @@ namespace QuickFix
         }
 
         protected void Persist(IMessage message, string messageString) {
-            if (this.PersistMessages) {
-                int msgSeqNum = message.MsgSeqNum;
-                state_.Set(msgSeqNum, messageString);
+            if (PersistMessages) {
+                SeqNumType msgSeqNum = message.MsgSeqNum;
+                _state.Set(msgSeqNum, messageString);
             }
-            state_.IncrNextSenderMsgSeqNum();
+            _state.IncrNextSenderMsgSeqNum();
         }
 
         protected bool IsGoodTime(Message msg)
@@ -1592,7 +1580,7 @@ namespace QuickFix
 
         protected bool SendRaw(Message message, SeqNumType seqNum)
         {
-            this.Log.OnOutgoing("Send[I]");
+            Log.OnOutgoing("Send[I]");
             lock (_sync)
             {
                 string msgType = message.Header.GetString(Fields.Tags.MsgType);
@@ -1628,11 +1616,11 @@ namespace QuickFix
                     }
                 }
 
-                this.Log.OnOutgoing("Send[T][0]");
+                Log.OnOutgoing("Send[T][0]");
 
                 string messageString = message.ConstructString();
 
-                this.Log.OnOutgoing("Send[T][1]");
+                Log.OnOutgoing("Send[T][1]");
 
                 if (0 == seqNum)
                     Persist(message, messageString);
@@ -1646,32 +1634,32 @@ namespace QuickFix
         /// <param name="message">message to send</param>
         /// <returns>true if was sent successfully</returns>
         public bool Send<T>(T message) where T : IMessage {
-            this.Log.FTSLogTraceAppend(" fixSessionSend");
-            this.Log.FTSLogTraceAppendElapsedTicks();
+            Log.FTSLogTraceAppend(" fixSessionSend");
+            Log.FTSLogTraceAppendElapsedTicks();
 
             bool resultSend;
 
             string outgoingMsg;
 
-            lock (sync_) {
-                this.Log.FTSLogTraceAppend(" sync");
-                this.Log.FTSLogTraceAppendElapsedTicks();
+            lock (_sync) {
+                Log.FTSLogTraceAppend(" sync");
+                Log.FTSLogTraceAppendElapsedTicks();
 
-                message.MsgSeqNum = state_.GetNextSenderMsgSeqNum();
+                message.MsgSeqNum = _state.NextSenderMsgSeqNum;
 
-                this.Log.FTSLogTraceAppend(" fixSetHeaders");
-                this.Log.FTSLogTraceAppendElapsedTicks();
+                Log.FTSLogTraceAppend(" fixSetHeaders");
+                Log.FTSLogTraceAppendElapsedTicks();
 
                 /*
                 //todo
-                if (this.EnableLastMsgSeqNumProcessed && !m.Header.IsSetField(Tags.LastMsgSeqNumProcessed)) {
-                    m.Header.SetField(new LastMsgSeqNumProcessed(this.NextTargetMsgSeqNum - 1));
+                if (EnableLastMsgSeqNumProcessed && !m.Header.IsSetField(Tags.LastMsgSeqNumProcessed)) {
+                    m.Header.SetField(new LastMsgSeqNumProcessed(NextTargetMsgSeqNum - 1));
                 }
                 */
 
                 /*
                 if (Message.IsAdminMsgType(message.MsgType)) {
-                    this.Application.ToAdmin(message, this.SessionID);
+                    Application.ToAdmin(message, SessionID);
 
                     if (MsgType.LOGON.Equals(message.MsgType) && !state_.ReceivedReset) {
                         Fields.ResetSeqNumFlag resetSeqNumFlag = new QuickFix.Fields.ResetSeqNumFlag(false);
@@ -1690,14 +1678,14 @@ namespace QuickFix
 
                 resultSend = Send(messageBytes);
 
-                state_.LastSentTimeDT = DateTime.UtcNow;
+                _state.LastSentTimeDT = DateTime.UtcNow;
 
                 outgoingMsg = CharEncoding.DefaultEncoding.GetString(messageBytes);
 
                 Persist(message, outgoingMsg);
             }
 
-            this.Log.OnOutgoing("Send " + outgoingMsg);
+            Log.OnOutgoing("Send " + outgoingMsg);
 
             return resultSend;
         }

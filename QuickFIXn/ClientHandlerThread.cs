@@ -93,7 +93,7 @@ namespace QuickFix
         }
 
         public bool Send(ReadOnlySpan<byte> rawData) {
-            return socketReader_.Send(rawData) > 0;
+            return _socketReader.Send(rawData) > 0;
         }
 
         public void Disconnect()

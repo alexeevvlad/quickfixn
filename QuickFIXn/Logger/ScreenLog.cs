@@ -58,6 +58,15 @@ public class ScreenLog : ILog
     }
     #endregion
 
+    #region ILog Members FTS
+
+    public void FTSLogTraceAppend(string s) { }
+    public void FTSLogTraceAppendElapsedTicks() { }
+
+    public void FTSLogTraceAppendElapsedTicksTotal() { }
+
+    #endregion
+
     #region IDisposable implementation
     public void Dispose()
     {
